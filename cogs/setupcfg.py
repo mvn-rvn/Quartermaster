@@ -15,14 +15,15 @@ class SetupCfg(commands.Cog):
         self.bot = bot
 
 
-    setup = SlashCommandGroup("setup", "(RESTRICTED) Configure role-based privileges and enable/disable certain commands")
+    setupcfg = SlashCommandGroup("setup", "(RESTRICTED) Configure role-based privileges and enable/disable certain commands")
 
 
-    @setup.command(description = "(RESTRICTED) Set which role is able to use restricted commands")
+    @setupcfg.command(description = "(RESTRICTED) Set which role is able to use restricted commands")
     async def restricted_access(self, ctx: discord.ApplicationContext, role: discord.Role):
 
         if await permshandler.check_perms(ctx) == False:
-            await ctx.respond(await errmsgs.no_perms_embed(ctx))
+            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
+            return
 
         db = await aiosqlite.connect("inv_manager.db")
         cursor = await db.cursor()
@@ -37,8 +38,107 @@ class SetupCfg(commands.Cog):
         await cursor.close()
         await db.close()
 
-        await ctx.respond("yo we updated the shit and stuff")
+        embed = discord.Embed(
+            title = "Restricted access updated",
+            description = f"Role `@{role.name}` has access to restricted commands.",
+            color = discord.Color.green()
+        )
 
+        await ctx.respond(embed=embed)
+
+
+    @setupcfg.command(description = "(RESTRICTED) Configure settings for the /steal command")
+    async def stealing(self, ctx: discord.ApplicationContext, success_rate: int, cooldown: int):
+
+        if await permshandler.check_perms(ctx) == False:
+            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
+            return
+
+        if success_rate > 100 or success_rate < 0:
+            embed = discord.Embed(
+                title = "Error",
+                description = "Success rate cannot be less than 0 or greater than 100.",
+                color = discord.Color.red()
+            )
+            await ctx.respond(embed=embed)
+            return
+
+        if cooldown < 0:
+            embed = discord.Embed(
+                title = "Error",
+                description = "Cooldown cannot be less than 0.",
+                color = discord.Color.red()
+            )
+            await ctx.respond(embed=embed)
+            return
+
+        db = await aiosqlite.connect("inv_manager.db")
+        cursor = await db.cursor()
+
+        await cursor.execute(f"""
+            UPDATE ServerConfigs
+            SET StealChance = {success_rate}
+            WHERE ServerID = {ctx.guild.id}
+        """)
+        await cursor.execute(f"""
+            UPDATE ServerConfigs
+            SET StealCooldown = {cooldown}
+            WHERE ServerID = {ctx.guild.id}
+        """)
+
+        await db.commit()
+        await cursor.close()
+        await db.close()
+
+        embed = discord.Embed(
+            title = "Steal command configurations updated",
+            color = discord.Color.green()
+        )
+
+        embed.add_field(name = "Steal Command Success Rate", value = f"{success_rate}%", inline = False)
+        if cooldown == 1:
+            embed.add_field(name = "Steal Command Cooldown", value = f"{cooldown} hour", inline = False)
+        else:
+            embed.add_field(name = "Steal Command Cooldown", value = f"{cooldown} hours", inline = False)
+
+        await ctx.respond(embed=embed)
+    
+
+    @setupcfg.command(description = "(RESTRICTED) Enable or disable the /find command")
+    async def finding(self, ctx: discord.ApplicationContext, enabled: bool):
+
+        if await permshandler.check_perms(ctx) == False:
+            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
+            return
+
+        db = await aiosqlite.connect("inv_manager.db")
+        cursor = await db.cursor()
+        
+        enabled_int: int = 0
+
+        if enabled == True:
+            enabled_int = 1
+            embed = discord.Embed(
+                title="Find command enabled.",
+                color = discord.Color.green()
+            )
+            await ctx.respond(embed=embed)
+        else:
+            embed = discord.Embed(
+                title="Find command disabled.",
+                color = discord.Color.green()
+            )
+            await ctx.respond(embed=embed)
+
+        await cursor.execute(f"""
+            UPDATE ServerConfigs
+            SET FindEnabled = {enabled_int}
+            WHERE ServerID = {ctx.guild.id}
+        """)
+
+        await db.commit()
+        await cursor.close()
+        await db.close()
         
 
 

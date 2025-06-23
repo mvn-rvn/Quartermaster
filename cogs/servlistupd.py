@@ -20,8 +20,6 @@ class ServListUpd(commands.Cog):
         await cursor.execute("SELECT ServerID FROM ServerConfigs")
         old_guild_id_list: list[int] = [i[0] for i in await cursor.fetchall()]
         new_guild_id_list: list[int] = [i.id for i in self.bot.guilds]
-        print(new_guild_id_list)
-        print(old_guild_id_list)
 
         for new_guild_id in new_guild_id_list:
             if new_guild_id not in old_guild_id_list:
@@ -48,7 +46,7 @@ class ServListUpd(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
 
-        db = await aiosqlite.connect("../inv_manager.db")
+        db = await aiosqlite.connect("inv_manager.db")
         cursor = await db.cursor()
 
         await cursor.execute("SELECT ServerID FROM ServerConfigs")
