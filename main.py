@@ -34,11 +34,13 @@ db_not_async.execute("""CREATE TABLE IF NOT EXISTS ServerConfigs (
 db_not_async.close()
 
 
-#delete this later, I'm using it as an example of command structure
-@bot.slash_command(name="hello", description="Say hello to the bot")
-async def hello(ctx: discord.ApplicationContext, name: str = None):
-    name = name or ctx.author.name
-    await ctx.respond(f"Hello {name}! {ctx.channel.permissions_for(ctx.author).administrator}")
+@bot.slash_command(description="Test the bot's response time to Discord")
+async def ping(ctx: discord.ApplicationContext):
+    embed = discord.Embed(
+        title = "Pong!",
+        description = f"Latency is {round(bot.latency * 1000)}ms."
+    )
+    await ctx.respond(embed=embed)
 
 
 bot.load_extension('cogs.setupcfg')
