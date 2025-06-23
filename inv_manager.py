@@ -54,19 +54,19 @@ async def check_perms(ctx: discord.ApplicationContext) -> bool:
         if role.id == role_id:
             return True
     #check if user has admin
-    #return ctx.channel.permissions_for(ctx.author).administrator
-    return False
+    return ctx.channel.permissions_for(ctx.author).administrator
 
 
-#creates and returns embed for when a user does not have the privileges to run a restricted command
-async def no_perms_message(ctx: discord.ApplicationContext) -> discord.Embed:
+#creates and returns text for when a user does not have the privileges to run a restricted command
+async def no_perms_message(ctx: discord.ApplicationContext) -> str:
     description: str
     role_id: int = await grab_restricted_role_id(ctx)
-    if role_id == None:
-        description = "You require Administrator privileges in order to use this command."
+    role: discord.Role = ctx.guild.get_role(await grab_restricted_role_id(ctx))
+    if role == None:
+        description = "Only users with Administrator privileges can use this command."
     else:
-        description = f"You require Administrator privileges or the "
-
+        description = f"Only users with Administrator privileges or the `@{role.name}` role can use this command."
+    return description
 
 
 #delete this later, I'm using it as an example of command structure
@@ -79,11 +79,17 @@ async def hello(ctx: discord.ApplicationContext, name: str = None):
 #configure (role, steal_chance): creates server's associated JSON file if it doesn't exist, and sets admin role and steal chance in that file.
 #steal_chance defaults to 0 if not specified
 @bot.slash_command(name="setup", description="(RESTRICTED) Configure steal settings and what role has access to restricted commands")
+@discord.ext.commands.guild_only()
 async def setup(ctx: discord.ApplicationContext, role: discord.Role, steal_chance: int = 0, steal_cooldown: int = 24):
     #check if user has privileges to run the command
     if await check_perms(ctx) == False:
         #send embed saying user doesn't have privileges
-        
+        embed = discord.Embed(
+            title = "Uh-oh",
+            description = await no_perms_message(ctx),
+            color = discord.Color.red()
+        )
+        await ctx.respond(embed=embed)
         #end function early
         return
     #check if steal_chance is between 0 and 100
