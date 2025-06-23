@@ -1,2 +1,4 @@
 .env
 inv_manager.db
+_pycache_
+*.pyc

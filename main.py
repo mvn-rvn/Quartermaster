@@ -28,45 +28,10 @@ db_not_async.execute("""CREATE TABLE IF NOT EXISTS ServerConfigs (
     ServerID int PRIMARY KEY, 
     RoleID int, 
     StealChance int, 
-    StealCooldown int
+    StealCooldown int,
+    FindEnabled int
 )""")
-
-
-#grabs restricted role ID of the server
-async def grab_restricted_role_id(ctx: discord.ApplicationContext) -> int:
-    db = await aiosqlite.connect("inv_manager.db")
-    cursor = await db.cursor()
-    await cursor.execute(f"""SELECT RoleID 
-        FROM ServerConfigs
-        WHERE ServerID = {ctx.guild.id}
-    """)
-    role_id: tuple[int] = await cursor.fetchone()
-    await cursor.close()
-    await db.close()
-    return role_id[0]
-
-
-#checks if user has the privileges to use restricted commands
-async def check_perms(ctx: discord.ApplicationContext) -> bool:
-    #check if user has restricted role
-    role_id = await grab_restricted_role_id(ctx)
-    for role in ctx.author.roles:
-        if role.id == role_id:
-            return True
-    #check if user has admin
-    return ctx.channel.permissions_for(ctx.author).administrator
-
-
-#creates and returns text for when a user does not have the privileges to run a restricted command
-async def no_perms_message(ctx: discord.ApplicationContext) -> str:
-    description: str
-    role_id: int = await grab_restricted_role_id(ctx)
-    role: discord.Role = ctx.guild.get_role(await grab_restricted_role_id(ctx))
-    if role == None:
-        description = "Only users with Administrator privileges can use this command."
-    else:
-        description = f"Only users with Administrator privileges or the `@{role.name}` role can use this command."
-    return description
+db_not_async.close()
 
 
 #delete this later, I'm using it as an example of command structure
@@ -75,7 +40,7 @@ async def hello(ctx: discord.ApplicationContext, name: str = None):
     name = name or ctx.author.name
     await ctx.respond(f"Hello {name}! {ctx.channel.permissions_for(ctx.author).administrator}")
 
-
+'''
 #configure (role, steal_chance): creates server's associated JSON file if it doesn't exist, and sets admin role and steal chance in that file.
 #steal_chance defaults to 0 if not specified
 @bot.slash_command(name="setup", description="(RESTRICTED) Configure steal settings and what role has access to restricted commands")
@@ -152,7 +117,10 @@ async def setup(ctx: discord.ApplicationContext, role: discord.Role, steal_chanc
     await db.commit()
     await cursor.close()
     await db.close()
+'''
 
+bot.load_extension('cogs.setupcfg')
+bot.load_extension('cogs.servlistupd')
 
 #bot run
 bot.run(TOKEN)
