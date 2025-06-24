@@ -40,7 +40,7 @@ class SetupCfg(commands.Cog):
 
         embed = discord.Embed(
             title = "Restricted access updated",
-            description = f"Role `@{role.name}` has access to restricted commands.",
+            description = f"Role <@&{role.id}> has access to restricted commands.",
             color = discord.Color.green()
         )
 
@@ -167,7 +167,7 @@ class SetupCfg(commands.Cog):
         if role == None:
             embed.add_field(name = "Role-based Restricted Access", value = "N/A", inline = False)
         else:
-            embed.add_field(name = "Role-based Restricted Access", value = f"`@{role.name}`", inline = False)
+            embed.add_field(name = "Role-based Restricted Access", value = f"<@&{role.id}>", inline = False)
         
         embed.add_field(name = "Steal Command Success Rate", value = f"{configs[1]}%", inline = False)
         
