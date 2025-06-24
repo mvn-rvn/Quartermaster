@@ -139,7 +139,49 @@ class SetupCfg(commands.Cog):
         await db.commit()
         await cursor.close()
         await db.close()
+
+
+    @setupcfg.command(description = "View current configuration settings")
+    async def view(self, ctx: discord.ApplicationContext):
+
+        db = await aiosqlite.connect("inv_manager.db")
+        cursor = await db.cursor()
+
+        await cursor.execute(f"""
+            SELECT RoleID, StealChance, StealCooldown, FindEnabled
+            FROM ServerConfigs
+            WHERE ServerID = {ctx.guild.id}
+        """)
         
+        configs = await cursor.fetchone()
+        
+        await cursor.close()
+        await db.close()
+        
+        role: discord.Role = ctx.guild.get_role(configs[0])
+        
+        embed = discord.Embed(
+            title = f"{ctx.guild.name}'s Settings"
+        )
+        
+        if role == None:
+            embed.add_field(name = "Role-based Restricted Access", value = "N/A", inline = False)
+        else:
+            embed.add_field(name = "Role-based Restricted Access", value = f"`@{role.name}`", inline = False)
+        
+        embed.add_field(name = "Steal Command Success Rate", value = f"{configs[1]}%", inline = False)
+        
+        if configs[2] == 1:
+            embed.add_field(name = "Steal Command Cooldown", value = f"{configs[2]} hour", inline = False)
+        else:
+            embed.add_field(name = "Steal Command Cooldown", value = f"{configs[2]} hours", inline = False)
+        
+        if configs[3] == 1:
+            embed.add_field(name = "Find Command", value = "Enabled", inline = False)
+        else:
+            embed.add_field(name = "Find Command", value = "Disabled", inline = False)
+            
+        await ctx.respond(embed=embed)
 
 
 def setup(bot):
