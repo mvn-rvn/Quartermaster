@@ -46,3 +46,21 @@ def quantity_less_than_one() -> discord.Embed:
     )
 
     return embed
+
+
+def naming_conflict(variant: bool) -> discord.Embed:
+    
+    description: str
+    
+    if variant == True:
+        description = "To avoid confusing the bot, a secret item cannot have the same name as a normal item."
+    else:
+        description = "To avoid confusing the bot, a normal item cannot have the same name as a secret item."
+    
+    embed = discord.Embed(
+        title = "Error",
+        description = description,
+        color = discord.Color.red()
+    )
+    
+    return embed
