@@ -59,7 +59,7 @@ class ServListUpd(commands.Cog):
                     StealCooldown,
                     FindEnabled
                 ) VALUES (
-                    {new_guild_id},
+                    {guild.id},
                     0,
                     0,
                     1
