@@ -1,12 +1,9 @@
 #built-in module imports
 import os
 import sqlite3
-import json
-import asyncio
 
 
 #external package imports
-import aiosqlite
 import discord
 import dotenv
 

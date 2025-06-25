@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from discord.commands import SlashCommandGroup
 import aiosqlite
-import sqlite3
 
 from permshandling import permshandler
 from commonerrmsgs import errmsgs
