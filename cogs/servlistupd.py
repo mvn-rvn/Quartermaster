@@ -36,6 +36,18 @@ class ServListUpd(commands.Cog):
                         1
                     )
                 """)
+            
+                await cursor.execute(f"""
+                    CREATE TABLE IF NOT EXISTS S_{new_guild_id} (
+                        ItemName text,
+                        UserID int,
+                        MessageID int,
+                        Quantity int,
+                        Secret int
+                    )
+                """)
+                
+                print(f"Created new data for server ID {new_guild_id}.")
 
         await db.commit()
         await cursor.close()
@@ -65,6 +77,18 @@ class ServListUpd(commands.Cog):
                     1
                 )
             """)
+            
+            await cursor.execute(f"""
+                CREATE TABLE IF NOT EXISTS S_{guild.id} (
+                    ItemName text,
+                    UserID int,
+                    MessageID int,
+                    Quantity int,
+                    Secret int
+                )
+            """)
+            
+            print(f"Created new data for server ID {guild.id}.")
 
         await db.commit()
         await cursor.close()
