@@ -23,19 +23,19 @@ class ServListUpd(commands.Cog):
         for new_guild_id in new_guild_id_list:
             if new_guild_id not in old_guild_id_list:
 
-                await cursor.execute(f"""
+                await cursor.execute("""
                     INSERT INTO ServerConfigs (
                         ServerID,
                         StealChance,
                         StealCooldown,
                         FindEnabled
                     ) VALUES (
-                        {new_guild_id},
+                        ?,
                         0,
                         0,
                         1
                     )
-                """)
+                """, (new_guild_id,))
                 
                 print(f"Created new data for server ID {new_guild_id}.")
 
@@ -54,19 +54,19 @@ class ServListUpd(commands.Cog):
         guild_id_list: list[int] = [i[0] for i in await cursor.fetchall()]
 
         if guild.id not in guild_id_list:
-            await cursor.execute(f"""
+            await cursor.execute("""
                 INSERT INTO ServerConfigs (
                     ServerID,
                     StealChance,
                     StealCooldown,
                     FindEnabled
                 ) VALUES (
-                    {guild.id},
+                    ?,
                     0,
                     0,
                     1
                 )
-            """)
+            """, (guild.id,))
             
             print(f"Created new data for server ID {guild.id}.")
 

@@ -27,11 +27,11 @@ class SetupCfg(commands.Cog):
         db = await aiosqlite.connect("inv_manager.db")
         cursor = await db.cursor()
         
-        await cursor.execute(f"""
+        await cursor.execute("""
             UPDATE ServerConfigs
-            SET RoleID = {role.id}
-            WHERE ServerID = {ctx.guild.id}
-        """)
+            SET RoleID = ?
+            WHERE ServerID = ?
+        """, (role.id, ctx.guild.id))
 
         await db.commit()
         await cursor.close()
@@ -74,16 +74,16 @@ class SetupCfg(commands.Cog):
         db = await aiosqlite.connect("inv_manager.db")
         cursor = await db.cursor()
 
-        await cursor.execute(f"""
+        await cursor.execute("""
             UPDATE ServerConfigs
-            SET StealChance = {success_rate}
-            WHERE ServerID = {ctx.guild.id}
-        """)
-        await cursor.execute(f"""
+            SET StealChance = ?
+            WHERE ServerID = ?
+        """, (success_rate, ctx.guild.id))
+        await cursor.execute("""
             UPDATE ServerConfigs
-            SET StealCooldown = {cooldown}
-            WHERE ServerID = {ctx.guild.id}
-        """)
+            SET StealCooldown = ?
+            WHERE ServerID = ?
+        """, (cooldown, ctx.guild.id))
 
         await db.commit()
         await cursor.close()
@@ -129,11 +129,11 @@ class SetupCfg(commands.Cog):
             )
             await ctx.respond(embed=embed)
 
-        await cursor.execute(f"""
+        await cursor.execute("""
             UPDATE ServerConfigs
-            SET FindEnabled = {enabled_int}
-            WHERE ServerID = {ctx.guild.id}
-        """)
+            SET FindEnabled = ?
+            WHERE ServerID = ?
+        """, (enabled_int, ctx.guild.id))
 
         await db.commit()
         await cursor.close()
@@ -146,11 +146,11 @@ class SetupCfg(commands.Cog):
         db = await aiosqlite.connect("inv_manager.db")
         cursor = await db.cursor()
 
-        await cursor.execute(f"""
+        await cursor.execute("""
             SELECT RoleID, StealChance, StealCooldown, FindEnabled
             FROM ServerConfigs
-            WHERE ServerID = {ctx.guild.id}
-        """)
+            WHERE ServerID = ?
+        """, (ctx.guild.id,))
         
         configs = await cursor.fetchone()
         

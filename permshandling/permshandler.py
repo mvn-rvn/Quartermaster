@@ -7,10 +7,10 @@ async def grab_restricted_role_id(ctx: discord.ApplicationContext) -> int:
     db = await aiosqlite.connect("inv_manager.db")
     cursor = await db.cursor()
 
-    await cursor.execute(f"""SELECT RoleID 
+    await cursor.execute("""SELECT RoleID 
         FROM ServerConfigs
-        WHERE ServerID = {ctx.guild.id}
-    """)
+        WHERE ServerID = ?
+    """, (ctx.guild.id,))
 
     role_id: tuple[int] = await cursor.fetchone()
 
