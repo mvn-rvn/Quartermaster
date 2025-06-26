@@ -28,6 +28,14 @@ db_not_async.execute("""CREATE TABLE IF NOT EXISTS ServerConfigs (
     StealCooldown int,
     FindEnabled int
 )""")
+db_not_async.execute("""CREATE TABLE IF NOT EXISTS MasterInv (
+    ItemName text,
+    ServerID int,
+    UserID int,
+    MessageID int,
+    Quantity int,
+    Secret int
+)""")
 db_not_async.close()
 
 
