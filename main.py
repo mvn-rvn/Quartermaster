@@ -21,6 +21,7 @@ async def on_ready():
 
 #database setup
 db_not_async = sqlite3.connect("inv_manager.db")
+
 db_not_async.execute("""CREATE TABLE IF NOT EXISTS ServerConfigs (
     ServerID int PRIMARY KEY, 
     RoleID int, 
@@ -28,14 +29,17 @@ db_not_async.execute("""CREATE TABLE IF NOT EXISTS ServerConfigs (
     StealCooldown int,
     FindEnabled int
 )""")
+
 db_not_async.execute("""CREATE TABLE IF NOT EXISTS MasterInv (
-    ItemName text,
+    ItemLower text,
+    ItemExact text,
     ServerID int,
     UserID int,
     MessageID int,
     Quantity int,
     Secret int
 )""")
+
 db_not_async.close()
 
 
