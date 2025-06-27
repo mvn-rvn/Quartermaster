@@ -2,7 +2,7 @@ import discord
 import aiosqlite
 
 
-async def check_exists_caseins(ctx: discord.ApplicationContext, input_name: str) -> tuple[bool, str, bool]:
+async def check_exists(ctx: discord.ApplicationContext, input_name: str) -> tuple[bool, str, bool]:
     
     db = await aiosqlite.connect("inv_manager.db")
     cursor = await db.cursor()
