@@ -42,6 +42,9 @@ async def check_secret_name_conflict(ctx: discord.ApplicationContext, input_name
         await db.close()
         return False
     
+    await cursor.close()
+    await db.close()
+    
     db_secret: bool = False
     if data[1] == 1:
         db_secret = True
