@@ -54,6 +54,7 @@ async def ping(ctx: discord.ApplicationContext):
 
 bot.load_extension('cogs.setupcfg')
 bot.load_extension('cogs.servlistupd')
+bot.load_extension('cogs.basicinvmanip')
 
 
 #bot run
