@@ -76,14 +76,9 @@ class SetupCfg(commands.Cog):
 
         await cursor.execute("""
             UPDATE ServerConfigs
-            SET StealChance = ?
+            SET StealChance = ?, StealCooldown = ?
             WHERE ServerID = ?
-        """, (success_rate, ctx.guild.id))
-        await cursor.execute("""
-            UPDATE ServerConfigs
-            SET StealCooldown = ?
-            WHERE ServerID = ?
-        """, (cooldown, ctx.guild.id))
+        """, (success_rate, cooldown, ctx.guild.id))
 
         await db.commit()
         await cursor.close()
