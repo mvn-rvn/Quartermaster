@@ -5,6 +5,7 @@ import aiosqlite
 from permshandling import permshandler
 from commonerrmsgs import errmsgs
 from userinvchecking import invchecker
+from userinvchecking.invchecker import ItemData
 
 #includes give, transfer, remove, inventory, peek
 class BasicInvManip(commands.Cog):
@@ -25,14 +26,14 @@ class BasicInvManip(commands.Cog):
             await ctx.respond(embed = errmsgs.quantity_less_than_one())
             return
         
-        db_data = await invchecker.check_exists(ctx, name)
+        db_data: ItemData = await invchecker.check_exists(ctx, name)
         
-        if db_data[0] == True and db_data[3] != is_secret:
+        if db_data.exists == True and db_data.secret != is_secret:
             await ctx.respond(embed = errmsgs.naming_conflict(is_secret))
             return
         
-        if db_data[1] != None:
-            name = db_data[1]
+        if db_data.name != None:
+            name = db_data.name
             
         is_secret_int: int = 0
         if is_secret == True:
@@ -41,7 +42,7 @@ class BasicInvManip(commands.Cog):
         db = await aiosqlite.connect("inv_manager.db")
         cursor = await db.cursor()
         
-        if db_data[0] == True:
+        if db_data.exists == True:
             await cursor.execute("""
                 UPDATE MasterInv
                 SET Quantity = Quantity + ?
