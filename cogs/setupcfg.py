@@ -14,7 +14,7 @@ class SetupCfg(commands.Cog):
         self.bot = bot
 
 
-    setupcfg = SlashCommandGroup("setup", "(RESTRICTED) Configure role-based privileges and enable/disable certain commands")
+    setupcfg = SlashCommandGroup("setup", "(RESTRICTED) Configure role-based privileges and tweak certain commands")
 
 
     @setupcfg.command(description = "(RESTRICTED) Set which role is able to use restricted commands")
