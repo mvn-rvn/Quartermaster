@@ -64,3 +64,41 @@ def naming_conflict(variant: bool) -> discord.Embed:
     )
     
     return embed
+
+
+def quantity_too_high(username: str = None) -> discord.Embed:
+    
+    description: str
+    
+    if username == None:
+        description = "Quantity is too high - you don't have enough of that item."
+    else:
+        description = f"Quantity is too high - {username} doesn't have enough of that item."
+    
+    embed = discord.Embed(
+        title = "Error",
+        description = description,
+        color = discord.Color.red()
+    )
+    
+    return embed
+
+
+def item_doesnt_exist(username: str = None, self_inv: bool = False) -> discord.Embed:
+    
+    description: str
+    
+    if self_inv == True:
+        description = "That item doesn't exist in your inventory!"
+    elif username != None:
+        description = f"That item doesn't exist in {username}'s inventory!" 
+    else:
+        description = "That item doesn't exist on this server!"
+    
+    embed = discord.Embed(
+        title = "Error",
+        description = description,
+        color = discord.Color.red()
+    )
+    
+    return embed
