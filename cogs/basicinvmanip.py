@@ -26,23 +26,25 @@ class BasicInvManip(commands.Cog):
             await ctx.respond(embed = errmsgs.quantity_less_than_one())
             return
         
-        db_data: ItemData = await invchecker.check_exists(ctx, name)
+        db_data_global: ItemData = await invchecker.check_exists(ctx, name)
         
-        if db_data.exists == True and db_data.secret != is_secret:
+        if db_data_global.exists == True and db_data_global.secret != is_secret:
             await ctx.respond(embed = errmsgs.naming_conflict(is_secret))
             return
         
-        if db_data.name != None:
-            name = db_data.name
+        if db_data_global.name != None:
+            name = db_data_global.name
             
         is_secret_int: int = 0
         if is_secret == True:
             is_secret_int = 1
             
+        db_data_user: ItemData = await invchecker.check_exists(ctx, name, user.id)
+            
         db = await aiosqlite.connect("inv_manager.db")
         cursor = await db.cursor()
         
-        if db_data.exists == True:
+        if db_data_user.exists == True:
             await cursor.execute("""
                 UPDATE MasterInv
                 SET Quantity = Quantity + ?

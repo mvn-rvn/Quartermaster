@@ -17,16 +17,27 @@ class ItemData:
             SECRET: {self.secret}"""
 
 
-async def check_exists(ctx: discord.ApplicationContext, input_name: str) -> ItemData:
+async def check_exists(ctx: discord.ApplicationContext, input_name: str, user_id: int = None) -> ItemData:
     
     db = await aiosqlite.connect("inv_manager.db")
     cursor = await db.cursor()
     
-    await cursor.execute("""
-        SELECT ItemExact, Quantity, Secret
-        FROM MasterInv
-        WHERE ServerID = ? AND ItemLower = ?
-    """, (ctx.guild.id, input_name.lower()))
+    if user_id != None:
+        await cursor.execute("""
+            SELECT ItemExact, Quantity, Secret
+            FROM MasterInv
+            WHERE ServerID = ? 
+            AND ItemLower = ?
+            AND UserID = ?
+        """, (ctx.guild.id, input_name.lower(), user_id))
+    
+    else:
+        await cursor.execute("""
+            SELECT ItemExact, Quantity, Secret
+            FROM MasterInv
+            WHERE ServerID = ? 
+            AND ItemLower = ?
+        """, (ctx.guild.id, input_name.lower()))
 
     data = await cursor.fetchone()
     
