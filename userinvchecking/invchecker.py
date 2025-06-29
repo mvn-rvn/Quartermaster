@@ -14,8 +14,7 @@ class ItemData:
         return f"""EXISTS: {self.exists}
             NAME: {self.name}
             QUANTITY: {self.quantity}
-            SECRET: {self.secret}
-        """
+            SECRET: {self.secret}"""
 
 
 async def check_exists(ctx: discord.ApplicationContext, input_name: str) -> ItemData:
