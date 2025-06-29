@@ -27,6 +27,7 @@ db_not_async.execute("""CREATE TABLE IF NOT EXISTS ServerConfigs (
     RoleID int, 
     StealChance int, 
     StealCooldown int,
+    StealLimit int,
     FindEnabled int
 )""")
 

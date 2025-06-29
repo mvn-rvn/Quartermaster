@@ -47,7 +47,7 @@ class SetupCfg(commands.Cog):
 
 
     @setupcfg.command(description = "(RESTRICTED) Configure settings for the /steal command")
-    async def stealing(self, ctx: discord.ApplicationContext, success_rate: int, cooldown: int):
+    async def stealing(self, ctx: discord.ApplicationContext, success_rate: int, cooldown: int, quantity_limit: int):
 
         if await permshandler.check_perms(ctx) == False:
             await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
@@ -70,6 +70,10 @@ class SetupCfg(commands.Cog):
             )
             await ctx.respond(embed=embed)
             return
+        
+        if quantity_limit < 1:
+            await ctx.respond(embed = errmsgs.quantity_less_than_one())
+            return
 
         db = await aiosqlite.connect("inv_manager.db")
         cursor = await db.cursor()
@@ -77,9 +81,10 @@ class SetupCfg(commands.Cog):
         await cursor.execute("""
             UPDATE ServerConfigs
             SET StealChance = ?, 
-                StealCooldown = ?
+                StealCooldown = ?,
+                StealLimit = ?
             WHERE ServerID = ?
-        """, (success_rate, cooldown, ctx.guild.id))
+        """, (success_rate, cooldown, quantity_limit, ctx.guild.id))
 
         await db.commit()
         await cursor.close()
@@ -95,6 +100,7 @@ class SetupCfg(commands.Cog):
             embed.add_field(name = "Steal Command Cooldown", value = f"{cooldown} hour", inline = False)
         else:
             embed.add_field(name = "Steal Command Cooldown", value = f"{cooldown} hours", inline = False)
+        embed.add_field(name = "Steal Quantity Limit", value = f"{quantity_limit}", inline = False)
 
         await ctx.respond(embed=embed)
     
@@ -143,7 +149,7 @@ class SetupCfg(commands.Cog):
         cursor = await db.cursor()
 
         await cursor.execute("""
-            SELECT RoleID, StealChance, StealCooldown, FindEnabled
+            SELECT RoleID, StealChance, StealCooldown, StealLimit, FindEnabled
             FROM ServerConfigs
             WHERE ServerID = ?
         """, (ctx.guild.id,))
@@ -171,7 +177,9 @@ class SetupCfg(commands.Cog):
         else:
             embed.add_field(name = "Steal Command Cooldown", value = f"{configs[2]} hours", inline = False)
         
-        if configs[3] == 1:
+        embed.add_field(name = "Steal Quantity Limit", value = f"{configs[3]}", inline = False)
+        
+        if configs[4] == 1:
             embed.add_field(name = "Find Command", value = "Enabled", inline = False)
         else:
             embed.add_field(name = "Find Command", value = "Disabled", inline = False)

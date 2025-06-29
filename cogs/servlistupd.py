@@ -28,11 +28,13 @@ class ServListUpd(commands.Cog):
                         ServerID,
                         StealChance,
                         StealCooldown,
+                        StealLimit,
                         FindEnabled
                     ) VALUES (
                         ?,
                         0,
                         0,
+                        5,
                         1
                     )
                 """, (new_guild_id,))
