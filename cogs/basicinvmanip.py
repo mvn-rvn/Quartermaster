@@ -4,7 +4,7 @@ import aiosqlite
 
 from permshandling import permshandler
 from commonerrmsgs import errmsgs
-from namechecking import namechecker
+from userinvchecking import invchecker
 
 #includes give, transfer, remove, inventory, peek
 class BasicInvManip(commands.Cog):
@@ -25,9 +25,9 @@ class BasicInvManip(commands.Cog):
             await ctx.respond(embed = errmsgs.quantity_less_than_one())
             return
         
-        db_data = await namechecker.check_exists(ctx, name)
+        db_data = await invchecker.check_exists(ctx, name)
         
-        if db_data[0] == True and db_data[2] != is_secret:
+        if db_data[0] == True and db_data[3] != is_secret:
             await ctx.respond(embed = errmsgs.naming_conflict(is_secret))
             return
         
