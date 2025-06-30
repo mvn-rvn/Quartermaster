@@ -160,6 +160,9 @@ class SetupCfg(commands.Cog):
         await db.close()
         
         role: discord.Role = ctx.guild.get_role(configs[0])
+        steal_success_rate: int = configs[1]
+        steal_cooldown: int = configs[2]
+        steal_quantity_limit = configs[3]
         
         embed = discord.Embed(
             title = f"{ctx.guild.name}'s Settings"
@@ -170,14 +173,14 @@ class SetupCfg(commands.Cog):
         else:
             embed.add_field(name = "Role-based Restricted Access", value = f"<@&{role.id}>", inline = False)
         
-        embed.add_field(name = "Steal Command Success Rate", value = f"{configs[1]}%", inline = False)
+        embed.add_field(name = "Steal Command Success Rate", value = f"{steal_success_rate}%", inline = False)
         
-        if configs[2] == 1:
-            embed.add_field(name = "Steal Command Cooldown", value = f"{configs[2]} hour", inline = False)
+        if steal_cooldown == 1:
+            embed.add_field(name = "Steal Command Cooldown", value = f"{steal_cooldown} hour", inline = False)
         else:
-            embed.add_field(name = "Steal Command Cooldown", value = f"{configs[2]} hours", inline = False)
+            embed.add_field(name = "Steal Command Cooldown", value = f"{steal_cooldown} hours", inline = False)
         
-        embed.add_field(name = "Steal Quantity Limit", value = f"{configs[3]}", inline = False)
+        embed.add_field(name = "Steal Quantity Limit", value = f"{steal_quantity_limit}", inline = False)
         
         if configs[4] == 1:
             embed.add_field(name = "Find Command", value = "Enabled", inline = False)
