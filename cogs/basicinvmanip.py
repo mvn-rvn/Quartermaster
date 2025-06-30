@@ -82,6 +82,62 @@ class BasicInvManip(commands.Cog):
             await ctx.respond(f"Gave {name} to <@{user.id}>.")
         else:
             await ctx.respond(f"Gave {quantity}x {name} to <@{user.id}>.")
+            
+      
+    @commands.slash_command(description = "(RESTRICTED) Removes a specified item from a user's inventory")
+    async def remove(self, ctx: discord.ApplicationContext, user: discord.Member, name: str, quantity: int = 1):
+        
+        if await permshandler.check_perms(ctx) == False:
+            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
+            return
+        
+        if quantity < 1:
+            await ctx.respond(embed = errmsgs.quantity_less_than_one())
+            return
+        
+        db_data_user: ItemData = await invchecker.check_exists(ctx, name, user.id)
+        
+        if db_data_user.exists == False:
+            await ctx.respond(embed = errmsgs.item_doesnt_exist(username = user.name))
+            return
+        
+        if db_data_user.quantity < quantity:
+            await ctx.respond(embed = errmsgs.quantity_too_high(user.name))
+            return
+        
+        db = await aiosqlite.connect("inv_manager.db")
+        cursor = await db.cursor()
+        
+        if db_data_user.quantity == quantity:
+            await cursor.execute("""
+                DELETE FROM MasterInv
+                WHERE ItemLower = ?
+                AND ServerID = ?
+                AND UserID = ?
+            """, (name.lower(), ctx.guild.id, user.id))
+        
+        else:
+            await cursor.execute("""
+                UPDATE MasterInv
+                SET Quantity = Quantity - ?
+                WHERE ItemLower = ?
+                AND ServerID = ?
+                AND UserID = ?
+            """, (quantity, name.lower(), ctx.guild.id, user.id))
+        
+        await db.commit()
+        await cursor.close()
+        await db.close()
+        
+        if db_data_user.secret == True:
+            db_data_user.name = f"__{db_data_user.name}__"
+        
+        if quantity == 1:
+            await ctx.respond(f"Removed {db_data_user.name} from <@{user.id}>'s inventory.")
+        else:
+            await ctx.respond(f"Removed {quantity}x {db_data_user.name} from <@{user.id}>'s inventory.")
+        
+        
         
         
         
