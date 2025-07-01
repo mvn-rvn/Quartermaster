@@ -26,34 +26,26 @@ class BasicInvManip(commands.Cog):
             await ctx.respond(embed = errmsgs.quantity_less_than_one())
             return
         
+        name_case_corrected: str
+        
         db_data_global: ItemData = await invchecker.check_exists(ctx, name)
         
-        if db_data_global.exists == True and db_data_global.secret != is_secret:
+        if db_data_global == None:
+            name_case_corrected = name
+            
+        elif db_data_global.secret != is_secret:
             await ctx.respond(embed = errmsgs.naming_conflict(is_secret))
             return
         
-        if db_data_global.name != None:
-            name = db_data_global.name
+        else:
+            name_case_corrected = db_data_global.name
             
-        is_secret_int: int = 0
-        if is_secret == True:
-            is_secret_int = 1
-            
-        db_data_user: ItemData = await invchecker.check_exists(ctx, name, user.id)
-            
+        db_data_user: ItemData = await invchecker.check_exists(ctx, name_case_corrected, user.id)
+        
         db = await aiosqlite.connect("inv_manager.db")
         cursor = await db.cursor()
         
-        if db_data_user.exists == True:
-            await cursor.execute("""
-                UPDATE MasterInv
-                SET Quantity = Quantity + ?
-                WHERE ItemLower = ?
-                AND ServerID = ?
-                AND UserID = ?
-            """, (quantity, name.lower(), ctx.guild.id, user.id))
-            
-        else:
+        if db_data_user == None:
             await cursor.execute("""
                 INSERT INTO MasterInv (
                     ItemLower,
@@ -70,18 +62,32 @@ class BasicInvManip(commands.Cog):
                     ?,
                     ?
                 )
-            """, (name.lower(), name, ctx.guild.id, user.id, quantity, is_secret_int))
+            """, (name_case_corrected.lower(), name_case_corrected, ctx.guild.id, user.id, quantity, int(is_secret)))
+        
+        else:
+            await cursor.execute("""
+                UPDATE MasterInv
+                SET Quantity = Quantity + ?
+                WHERE ItemLower = ?
+                AND ServerID = ?
+                AND UserID = ?
+            """, (quantity, name_case_corrected.lower(), ctx.guild.id, user.id))
         
         await db.commit()
         await cursor.close()
         await db.close()
         
+        displayed_name: str
+        
         if is_secret == True:
-            name = f"__{name}__"
-        if quantity == 1:
-            await ctx.respond(f"Gave {name} to <@{user.id}>.")
+            displayed_name = f"__{name_case_corrected}__"
         else:
-            await ctx.respond(f"Gave {quantity}x {name} to <@{user.id}>.")
+            displayed_name = name_case_corrected
+        
+        if quantity == 1:
+            await ctx.respond(f"Gave {displayed_name} to <@{user.id}>.")
+        else:
+            await ctx.respond(f"Gave {quantity}x {displayed_name} to <@{user.id}>.")
             
       
     @commands.slash_command(description = "(RESTRICTED) Removes a specified item from a user's inventory")
@@ -97,7 +103,7 @@ class BasicInvManip(commands.Cog):
         
         db_data_user: ItemData = await invchecker.check_exists(ctx, name, user.id)
         
-        if db_data_user.exists == False:
+        if db_data_user == None:
             await ctx.respond(embed = errmsgs.item_doesnt_exist(username = user.name))
             return
         
@@ -129,13 +135,19 @@ class BasicInvManip(commands.Cog):
         await cursor.close()
         await db.close()
         
+        name_case_corrected: str = db_data_user.name
+        
+        displayed_name: str
+        
         if db_data_user.secret == True:
-            db_data_user.name = f"__{db_data_user.name}__"
+            displayed_name = f"__{name_case_corrected}__"
+        else:
+            displayed_name = name_case_corrected
         
         if quantity == 1:
-            await ctx.respond(f"Removed {db_data_user.name} from <@{user.id}>'s inventory.")
+            await ctx.respond(f"Removed {displayed_name} from <@{user.id}>'s inventory.")
         else:
-            await ctx.respond(f"Removed {quantity}x {db_data_user.name} from <@{user.id}>'s inventory.")
+            await ctx.respond(f"Removed {quantity}x {displayed_name} from <@{user.id}>'s inventory.")
         
         
         
