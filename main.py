@@ -60,7 +60,16 @@ def guilds_only(ctx: discord.ApplicationContext):
     if ctx.guild == None and ctx.command.cog.__cog_name__ != "Help":
         raise commands.NoPrivateMessage()
     return True
-        
+
+@bot.event
+async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+    if isinstance(error, commands.NoPrivateMessage):
+        embed = discord.Embed(
+            title = "Error",
+            description = "This command can only be run in a server.",
+            color = discord.Color.red()
+        )
+        await ctx.respond(embed=embed)
 
 
 bot.load_extension('cogs.setupcfg')
