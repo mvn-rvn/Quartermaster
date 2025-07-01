@@ -19,11 +19,11 @@ class BasicInvManip(commands.Cog):
     async def give(self, ctx: discord.ApplicationContext, user: discord.Member, name: str, quantity: int = 1, is_secret: bool = False):
         
         if await permshandler.check_perms(ctx) == False:
-            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
+            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx), ephemeral=True)
             return
         
         if quantity < 1:
-            await ctx.respond(embed = errmsgs.quantity_less_than_one())
+            await ctx.respond(embed = errmsgs.quantity_less_than_one(), ephemeral=True)
             return
         
         name_case_corrected: str
@@ -34,7 +34,7 @@ class BasicInvManip(commands.Cog):
             name_case_corrected = name
             
         elif db_data_global.secret != is_secret:
-            await ctx.respond(embed = errmsgs.naming_conflict(is_secret))
+            await ctx.respond(embed = errmsgs.naming_conflict(is_secret), ephemeral=True)
             return
         
         else:
@@ -94,21 +94,21 @@ class BasicInvManip(commands.Cog):
     async def remove(self, ctx: discord.ApplicationContext, user: discord.Member, name: str, quantity: int = 1):
         
         if await permshandler.check_perms(ctx) == False:
-            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
+            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx), ephemeral=True)
             return
         
         if quantity < 1:
-            await ctx.respond(embed = errmsgs.quantity_less_than_one())
+            await ctx.respond(embed = errmsgs.quantity_less_than_one(), ephemeral=True)
             return
         
         db_data_user: ItemData = await invchecker.check_exists(ctx, name, user.id)
         
         if db_data_user == None:
-            await ctx.respond(embed = errmsgs.item_doesnt_exist(username = user.name))
+            await ctx.respond(embed = errmsgs.item_doesnt_exist(username = user.name), ephemeral=True)
             return
         
         if db_data_user.quantity < quantity:
-            await ctx.respond(embed = errmsgs.quantity_too_high(user.name))
+            await ctx.respond(embed = errmsgs.quantity_too_high(user.name), ephemeral=True)
             return
         
         db = await aiosqlite.connect("inv_manager.db")

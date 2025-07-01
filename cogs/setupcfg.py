@@ -21,7 +21,7 @@ class SetupCfg(commands.Cog):
     async def restricted_access(self, ctx: discord.ApplicationContext, role: discord.Role):
 
         if await permshandler.check_perms(ctx) == False:
-            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
+            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx), ephemeral=True)
             return
 
         db = await aiosqlite.connect("inv_manager.db")
@@ -50,7 +50,7 @@ class SetupCfg(commands.Cog):
     async def stealing(self, ctx: discord.ApplicationContext, success_rate: int, cooldown: int, quantity_limit: int):
 
         if await permshandler.check_perms(ctx) == False:
-            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
+            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx), ephemeral=True)
             return
 
         if success_rate > 100 or success_rate < 0:
@@ -59,7 +59,7 @@ class SetupCfg(commands.Cog):
                 description = "Success rate cannot be less than 0 or greater than 100.",
                 color = discord.Color.red()
             )
-            await ctx.respond(embed=embed)
+            await ctx.respond(embed=embed, ephemeral=True)
             return
 
         if cooldown < 0:
@@ -68,11 +68,11 @@ class SetupCfg(commands.Cog):
                 description = "Cooldown cannot be less than 0.",
                 color = discord.Color.red()
             )
-            await ctx.respond(embed=embed)
+            await ctx.respond(embed=embed, ephemeral=True)
             return
         
         if quantity_limit < 1:
-            await ctx.respond(embed = errmsgs.quantity_less_than_one())
+            await ctx.respond(embed = errmsgs.quantity_less_than_one(), ephemeral=True)
             return
 
         db = await aiosqlite.connect("inv_manager.db")
@@ -109,7 +109,7 @@ class SetupCfg(commands.Cog):
     async def finding(self, ctx: discord.ApplicationContext, enabled: bool):
 
         if await permshandler.check_perms(ctx) == False:
-            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx))
+            await ctx.respond(embed = await errmsgs.no_perms_embed(ctx), ephemeral=True)
             return
 
         db = await aiosqlite.connect("inv_manager.db")
