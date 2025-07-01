@@ -54,7 +54,7 @@ async def ping(ctx: discord.ApplicationContext):
     await ctx.respond(embed=embed)
 
 
-#this is probably stupid
+#this is probably stupid ngl
 @bot.check
 def guilds_only(ctx: discord.ApplicationContext):
     if ctx.guild == None and ctx.command.cog.__cog_name__ != "Help":
