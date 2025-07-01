@@ -5,6 +5,7 @@ import sqlite3
 
 #external package imports
 import discord
+from discord.ext import commands
 import dotenv
 
 
@@ -51,6 +52,15 @@ async def ping(ctx: discord.ApplicationContext):
         description = f"Latency is {round(bot.latency * 1000)}ms."
     )
     await ctx.respond(embed=embed)
+
+
+#this is probably stupid
+@bot.check
+def guilds_only(ctx: discord.ApplicationContext):
+    if ctx.guild == None and ctx.command.cog.__cog_name__ != "Help":
+        raise commands.NoPrivateMessage()
+    return True
+        
 
 
 bot.load_extension('cogs.setupcfg')
