@@ -1,6 +1,6 @@
 import discord
 
-from permshandling import permshandler
+from modules import permshandler
 
 
 async def no_perms_text(ctx: discord.ApplicationContext) -> str:
